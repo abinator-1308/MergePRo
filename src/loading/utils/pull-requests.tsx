@@ -5,13 +5,19 @@ import {
   PullsSearchResponseItem,
   RepoReference,
 } from "../../github-api/api";
-import { PullRequest } from "../../storage/loaded-state";
+import {
+  Comment,
+  Commit,
+  PullRequest,
+  Review,
+} from "../../storage/loaded-state";
 
-//Refreshes the list of pull requests for a list of repositories.
 export async function refreshOpenPullRequests(
   githubApi: GitHubApi,
   userLogin: string
 ): Promise<PullRequest[]> {
+  // Note: each query should specifically exclude the previous ones so we don't end up having
+  // to deduplicate PRs across lists.
   const reviewRequestedPullRequests = await githubApi.searchPullRequests(
     `review-requested:${userLogin} -author:${userLogin} is:open archived:false`
   );
@@ -24,7 +30,6 @@ export async function refreshOpenPullRequests(
   const ownPullRequests = await githubApi.searchPullRequests(
     `author:${userLogin} is:open archived:false`
   );
-
   return Promise.all([
     ...reviewRequestedPullRequests.map((pr) =>
       updateCommentsAndReviews(githubApi, pr, true)
@@ -49,12 +54,39 @@ async function updateCommentsAndReviews(
     repo,
     number: rawPullRequest.number,
   };
-  const [freshPullRequestDetails] = await Promise.all([
+  const [
+    freshPullRequestDetails,
+    freshReviews,
+    freshComments,
+    freshCommits,
+  ] = await Promise.all([
     githubApi.loadPullRequestDetails(pr),
+    githubApi.loadReviews(pr).then((reviews) =>
+      reviews.map((review) => ({
+        authorLogin: review.user.login,
+        state: review.state,
+        submittedAt: review.submitted_at,
+      }))
+    ),
+    githubApi.loadComments(pr).then((comments) =>
+      comments.map((comment) => ({
+        authorLogin: comment.user.login,
+        createdAt: comment.created_at,
+      }))
+    ),
+    githubApi.loadCommits(pr).then((commits) =>
+      commits.map((commit) => ({
+        authorLogin: commit.author ? commit.author.login : "",
+        createdAt: commit.commit.author.date,
+      }))
+    ),
   ]);
   return pullRequestFromResponse(
     rawPullRequest,
     freshPullRequestDetails,
+    freshReviews,
+    freshComments,
+    freshCommits,
     isReviewRequested
   );
 }
@@ -62,10 +94,12 @@ async function updateCommentsAndReviews(
 function pullRequestFromResponse(
   response: PullsSearchResponseItem,
   details: Octokit.PullsGetResponse,
+  reviews: Review[],
+  comments: Comment[],
+  commits: Commit[],
   reviewRequested: boolean
 ): PullRequest {
   const repo = extractRepo(response);
-
   return {
     nodeId: response.node_id,
     htmlUrl: response.html_url,
@@ -84,6 +118,9 @@ function pullRequestFromResponse(
     requestedReviewers: details.requested_reviewers.map(
       (reviewer) => reviewer.login
     ),
+    reviews,
+    comments,
+    commits,
   };
 }
 

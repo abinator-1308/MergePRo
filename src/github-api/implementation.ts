@@ -62,5 +62,32 @@ export function buildGitHubApi(token: string): GitHubApi {
       });
       return response.data;
     },
+    loadReviews(pr) {
+      return octokit.paginate(
+        octokit.pulls.listReviews.endpoint.merge({
+          owner: pr.repo.owner,
+          repo: pr.repo.name,
+          pull_number: pr.number,
+        })
+      );
+    },
+    loadComments(pr) {
+      return octokit.paginate(
+        octokit.issues.listComments.endpoint.merge({
+          owner: pr.repo.owner,
+          repo: pr.repo.name,
+          issue_number: pr.number,
+        })
+      );
+    },
+    loadCommits(pr) {
+      return octokit.paginate(
+        octokit.pulls.listCommits.endpoint.merge({
+          owner: pr.repo.owner,
+          repo: pr.repo.name,
+          pull_number: pr.number,
+        })
+      );
+    },
   };
 }

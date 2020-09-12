@@ -1,4 +1,5 @@
 import { Octokit } from "@octokit/rest";
+import { ReviewState } from "../storage/loaded-state";
 
 export interface GitHubApi {
   // load user details
@@ -11,11 +12,19 @@ export interface GitHubApi {
   loadPullRequestDetails(
     pr: PullRequestReference
   ): Promise<Octokit.PullsGetResponse>;
-}
 
-export interface GetAuthenticatedUserResponse {
-  login: string;
-  avatar_url: string;
+  //load pr reviews
+  loadReviews(pr: PullRequestReference): Promise<PullsListReviewsResponse>;
+
+  // load pr comments
+  loadComments(
+    pr: PullRequestReference
+  ): Promise<Octokit.IssuesListCommentsResponse>;
+
+  // load pr commits
+  loadCommits(
+    pr: PullRequestReference
+  ): Promise<Octokit.PullsListCommitsResponse>;
 }
 
 export interface RepoReference {
@@ -26,6 +35,19 @@ export interface RepoReference {
 export interface PullRequestReference {
   repo: RepoReference;
   number: number;
+}
+
+export interface GetAuthenticatedUserResponse {
+  login: string;
+  avatar_url: string;
+}
+
+export type PullsListReviewsResponse = PullsListReviewsResponseItem[];
+
+export interface PullsListReviewsResponseItem
+  extends Octokit.PullsListReviewsResponseItem {
+  state: ReviewState;
+  submitted_at: string;
 }
 
 export type PullsSearchResponse = PullsSearchResponseItem[];
