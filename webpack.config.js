@@ -36,10 +36,6 @@ module.exports = {
     background: "./src/background.ts",
     popup: "./src/popup.tsx",
   },
-  
-  entry: {
-    popup: "./src/popup.tsx",
-  },
   resolve: {
     extensions: [".tsx", ".ts", ".js", ".json"],
   },
