@@ -47,5 +47,20 @@ export function buildGitHubApi(token: string): GitHubApi {
       const response = await octokit.users.getAuthenticated({});
       return response.data;
     },
+    searchPullRequests(query) {
+      return octokit.paginate(
+        octokit.search.issuesAndPullRequests.endpoint.merge({
+          q: `is:pr ${query}`,
+        })
+      );
+    },
+    async loadPullRequestDetails(pr) {
+      const response = await octokit.pulls.get({
+        owner: pr.repo.owner,
+        repo: pr.repo.name,
+        pull_number: pr.number,
+      });
+      return response.data;
+    },
   };
 }
