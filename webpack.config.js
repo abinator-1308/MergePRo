@@ -2,9 +2,8 @@ const path = require("path");
 const webpack = require("webpack");
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
   .BundleAnalyzerPlugin;
-const HtmlWebpackPlugin = require("html-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
-
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
   module: {
@@ -33,6 +32,7 @@ module.exports = {
     ],
   },
   entry: {
+    background: "./src/background.ts",
     popup: "./src/popup.tsx",
   },
   resolve: {
@@ -56,13 +56,11 @@ module.exports = {
       inject: true,
       chunks: ["popup"],
     }),
-    
-  new CopyPlugin([
-    { from: "manifest.json", to: "." },
-    { from: "images", to: "images" },
-  ]),
-
     new webpack.IgnorePlugin(/^\.\/locale$/),
+    new CopyPlugin([
+      { from: "manifest.json", to: "." },
+      { from: "images", to: "images" },
+    ]),
     ...(process.env.BUNDLE_ANALYZER ? [new BundleAnalyzerPlugin()] : []),
   ],
 };

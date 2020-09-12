@@ -4,7 +4,16 @@ import { ChromeApi, ChromeStorageItems } from "./api";
 // fake implementation for dev purpose
 
 const partialFakeChrome: RecursivePartial<ChromeApi> = {
-  browserAction: {},
+  browserAction: {
+    setBadgeText(details: chrome.browserAction.BadgeTextDetails) {
+      console.log("chrome.browserAction.setBadgeText", details);
+    },
+    setBadgeBackgroundColor(
+      details: chrome.browserAction.BadgeBackgroundColorDetails
+    ) {
+      console.log("chrome.browserAction.setBadgeBackgroundColor", details);
+    },
+  },
   runtime: {
     // Sending a message won't do anything, but we can at least log it.
     sendMessage(message: unknown) {
@@ -55,6 +64,22 @@ const partialFakeChrome: RecursivePartial<ChromeApi> = {
           }, {})
         );
       },
+    },
+  },
+  tabs: {
+    query(
+      _queryInfo: chrome.tabs.QueryInfo,
+      callback: (result: chrome.tabs.Tab[]) => void
+    ) {
+      callback([]);
+    },
+    create(properties: chrome.tabs.CreateProperties) {
+      window.open(properties.url);
+    },
+  },
+  windows: {
+    update(windowId: number, updateInfo: chrome.windows.UpdateInfo) {
+      console.log("chrome.windows.update", windowId, updateInfo);
     },
   },
 };
