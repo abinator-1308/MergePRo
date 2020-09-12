@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Row } from "./design/Row";
 import { Settings } from "./Settings";
 import { CoreProps } from "../interface";

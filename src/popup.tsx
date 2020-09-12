@@ -11,7 +11,10 @@ import { faReply } from "@fortawesome/free-solid-svg-icons/faReply";
 import "bootstrap/dist/css/bootstrap.min.css";
 import React from "react";
 import ReactDOM from "react-dom";
+import { chromeApiSingleton } from "./chrome/implementation";
 import { App } from "./components/App";
+import { Core } from "./state/core";
+import { buildEnvironment } from "./environment/implementation";
  
 library.add(faBan);
 library.add(faBell);
@@ -21,7 +24,11 @@ library.add(faPodcast);
 library.add(faReply);
 library.add(faPen);
 library.add(faClone);
- 
+
+const env = buildEnvironment(chromeApiSingleton);
+const core = new Core(env);
+core.load().catch(console.error);
+
 ReactDOM.render(
  <>
    <Global
@@ -48,7 +55,7 @@ ReactDOM.render(
        }
      `}
    />
-   <App/>
+  <App core={core} />
  </>,
  document.getElementById("root")
 );
