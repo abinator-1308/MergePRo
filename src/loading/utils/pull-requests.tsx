@@ -30,12 +30,13 @@ export async function refreshOpenPullRequests(
   const ownPullRequests = await githubApi.searchPullRequests(
     `author:${userLogin} is:open archived:false`
   );
+
   return Promise.all([
     ...reviewRequestedPullRequests.map((pr) =>
-      updateCommentsAndReviews(githubApi, pr, true)
+      updateCommentsAndReviews(githubApi, pr, false, true)
     ),
     ...mentionedPullRequests.map((pr) =>
-      updateCommentsAndReviews(githubApi, pr, true)
+      updateCommentsAndReviews(githubApi, pr, true, false)
     ),
     ...commentedPullRequests.map((pr) =>
       updateCommentsAndReviews(githubApi, pr)
@@ -47,6 +48,7 @@ export async function refreshOpenPullRequests(
 async function updateCommentsAndReviews(
   githubApi: GitHubApi,
   rawPullRequest: PullsSearchResponseItem,
+  userMentioned = false,
   isReviewRequested = false
 ): Promise<PullRequest> {
   const repo = extractRepo(rawPullRequest);
@@ -87,6 +89,7 @@ async function updateCommentsAndReviews(
     freshReviews,
     freshComments,
     freshCommits,
+    userMentioned,
     isReviewRequested
   );
 }
@@ -97,9 +100,11 @@ function pullRequestFromResponse(
   reviews: Review[],
   comments: Comment[],
   commits: Commit[],
+  userMentioned: boolean,
   reviewRequested: boolean
 ): PullRequest {
   const repo = extractRepo(response);
+
   return {
     nodeId: response.node_id,
     htmlUrl: response.html_url,
@@ -115,6 +120,7 @@ function pullRequestFromResponse(
     draft: response.draft,
     mergeable: details.mergeable,
     reviewRequested,
+    userMentioned,
     requestedReviewers: details.requested_reviewers.map(
       (reviewer) => reviewer.login
     ),

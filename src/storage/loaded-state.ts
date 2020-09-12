@@ -40,6 +40,7 @@ export interface PullRequest {
   draft?: boolean;
   mergeable?: boolean;
   reviewRequested: boolean;
+  userMentioned: boolean;
   requestedReviewers?: string[];
   reviews: Review[];
   comments: Comment[];
