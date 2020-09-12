@@ -19,6 +19,14 @@
     "react-hot-loader": "^4.12.21",
     "style-loader": "^1.1.4",
     "ts-jest": "^25.4.0",
+    "@typescript-eslint/eslint-plugin": "^1.13.0",
+    "@typescript-eslint/parser": "^1.13.0",
+    "copy-webpack-plugin": "^5.1.1",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.3",
+    "eslint-plugin-react": "^7.19.0",
+    "prettier": "^2.0.5",
     "ts-loader": "^7.0.1",
     "typescript": "^3.8.3",
     "webpack": "^4.43.0",
@@ -31,6 +39,8 @@
     "start": "webpack-dev-server --open",
     "watch": "tsc --noEmit --watch",
     "build": "rm -rf dist;webpack --mode production",
-    "build-windows": "webpack --mode production"
+    "build-windows": "webpack --mode production",
+    "lint:check": "eslint \"src/**/*.ts\" \"src/**/*.tsx\"",
+    "lint:fix": "eslint --fix \"src/**/*.ts\" \"src/**/*.tsx\""
   }
 }
