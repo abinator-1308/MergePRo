@@ -1,3 +1,4 @@
+import { Filter } from "../filtering/filters";
 import { Core } from "../state/core";
 
 export interface CoreProps {
@@ -5,7 +6,11 @@ export interface CoreProps {
 }
 
 export interface UpdateFormProps {
-    title: string;
-    openFunc(): void;
-    desc: string;
-  }
+  title: string;
+  openFunc(): void;
+  desc: string;
+}
+
+export interface PopupState {
+  currentFilter: Filter;
+}

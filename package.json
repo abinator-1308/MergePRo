@@ -5,8 +5,11 @@
     "@octokit/rest": "^16.43.0",
     "mobx": "^5.15.4",
     "mobx-react-lite": "^2.0.6",
+    "bootstrap": "^4.4.1",
     "react": "^16.13.1",
-    "react-dom": "^16.13.1"
+    "react-bootstrap": "^1.0.0",
+    "react-dom": "^16.13.1",
+    "react-spinners": "^0.8.1"
   },
   "devDependencies": {
     "@babel/core": "^7.9.0",
