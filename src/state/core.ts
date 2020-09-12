@@ -1,6 +1,14 @@
-import { observable } from "mobx";
+import { observable, computed } from "mobx";
 import { Environment } from "../environment/api";
 import { LoadedState } from "../storage/loaded-state";
+import { BadgeState } from "../badge/api";
+import { EnrichedPullRequest } from "../filtering/enriched-pull-request";
+import {
+  Filter,
+  FilteredPullRequests,
+  filterPullRequests,
+} from "../filtering/filters";
+import { NOTHING_MUTED } from "../storage/mute-configuration";
 
 export class Core {
   private readonly env: Environment;
@@ -10,6 +18,8 @@ export class Core {
   @observable token: string | null = null;
   @observable loadedState: LoadedState | null = null;
   @observable lastError: string | null = null;
+  @observable muteConfiguration = NOTHING_MUTED;
+
 
   constructor(env: Environment) {
     this.env = env;
@@ -54,6 +64,63 @@ export class Core {
       return;
     }
     await this.saveRefreshing(true);
+  }
+
+  @computed
+  get filteredPullRequests(): FilteredPullRequests | null {
+    const lastCheck = this.loadedState;
+    if (!lastCheck || !lastCheck.userLogin) {
+      return null;
+    }
+    return filterPullRequests(
+      this.env,
+      lastCheck.userLogin,
+      lastCheck.openPullRequests,
+      this.muteConfiguration
+    );
+  }
+
+  @computed
+  get unreviewedPullRequests(): EnrichedPullRequest[] | null {
+    return this.filteredPullRequests
+      ? this.filteredPullRequests[Filter.INCOMING]
+      : null;
+  }
+
+  @computed
+  get actionRequiredOwnPullRequests(): EnrichedPullRequest[] | null {
+    return this.filteredPullRequests
+      ? this.filteredPullRequests[Filter.MINE].filter(
+          (pr) =>
+            pr.state.kind === "outgoing" &&
+            (pr.state.approvedByEveryone || pr.state.changesRequested)
+        )
+      : null;
+  }
+
+  private updateBadge() {
+    let badgeState: BadgeState;
+    const unreviewedPullRequests = this.unreviewedPullRequests;
+    if (this.lastError || !this.token) {
+      badgeState = {
+        kind: "error",
+      };
+    } else if (!unreviewedPullRequests) {
+      badgeState = {
+        kind: "initializing",
+      };
+    } else if (this.refreshing) {
+      badgeState = {
+        kind: "reloading",
+        unreviewedPullRequestCount: unreviewedPullRequests.length,
+      };
+    } else {
+      badgeState = {
+        kind: "loaded",
+        unreviewedPullRequestCount: unreviewedPullRequests.length,
+      };
+    }
+    this.env.badger.update(badgeState);
   }
 
   private async saveError(error: string | null) {

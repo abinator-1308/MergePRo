@@ -8,7 +8,6 @@ import { faClone } from "@fortawesome/free-solid-svg-icons/faClone";
 import { faPen } from "@fortawesome/free-solid-svg-icons/faPen";
 import { faPodcast } from "@fortawesome/free-solid-svg-icons/faPodcast";
 import { faReply } from "@fortawesome/free-solid-svg-icons/faReply";
-import "bootstrap/dist/css/bootstrap.min.css";
 import React from "react";
 import ReactDOM from "react-dom";
 import { chromeApiSingleton } from "./chrome/implementation";
