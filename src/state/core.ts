@@ -7,7 +7,7 @@ import {
   FilteredPullRequests,
   filterPullRequests,
 } from "../filtering/filters";
-import { LoadedState } from "../storage/loaded-state";
+import { LoadedState, PullRequest } from "../storage/loaded-state";
 
 export class Core {
   private readonly env: Environment;
@@ -16,6 +16,7 @@ export class Core {
   @observable refreshing: boolean = false;
   @observable token: string | null = null;
   @observable loadedState: LoadedState | null = null;
+  @observable notifiedPullRequestUrls = new Set<string>();
   @observable lastError: string | null = null;
 
   constructor(env: Environment) {
@@ -26,6 +27,9 @@ export class Core {
         this.load();
       }
     });
+    this.env.notifier.registerClickListener((url) =>
+      this.openPullRequest(url).catch(console.error)
+    );
   }
 
   async load() {
@@ -33,12 +37,16 @@ export class Core {
     if (this.token !== null) {
       this.refreshing = await this.env.store.currentlyRefreshing.load();
       this.lastError = await this.env.store.lastError.load();
+      this.notifiedPullRequestUrls = new Set(
+        await this.env.store.notifiedPullRequests.load()
+      );
       this.loadedState = await this.env.store.lastCheck.load();
     } else {
       this.refreshing = false;
       this.lastError = null;
       this.token = null;
       this.loadedState = null;
+      this.notifiedPullRequestUrls = new Set();
     }
     this.overallStatus = "loaded";
     this.updateBadge();
@@ -49,6 +57,7 @@ export class Core {
     await this.env.store.token.save(token);
     await this.saveRefreshing(false);
     await this.saveError(null);
+    await this.saveNotifiedPullRequests([]);
     await this.saveLoadedState(null);
     await this.load();
     this.triggerBackgroundRefresh();
@@ -72,6 +81,15 @@ export class Core {
         startRefreshTimestamp,
         ...(await this.env.githubLoader(this.token, this.loadedState)),
       });
+      const notifyAboutPullRequests = [
+        ...(this.unreviewedPullRequests || []),
+        ...(this.actionRequiredOwnPullRequests || []),
+      ];
+      await this.env.notifier.notify(
+        notifyAboutPullRequests,
+        this.notifiedPullRequestUrls
+      );
+      await this.saveNotifiedPullRequests(notifyAboutPullRequests);
       this.saveError(null);
     } catch (e) {
       this.saveError(e.message);
@@ -118,6 +136,28 @@ export class Core {
       : null;
   }
 
+  private async saveNotifiedPullRequests(pullRequests: PullRequest[]) {
+    this.notifiedPullRequestUrls = new Set(pullRequests.map((p) => p.htmlUrl));
+    await this.env.store.notifiedPullRequests.save(
+      Array.from(this.notifiedPullRequestUrls)
+    );
+  }
+
+  private async saveError(error: string | null) {
+    this.lastError = error;
+    await this.env.store.lastError.save(error);
+  }
+
+  private async saveRefreshing(refreshing: boolean) {
+    this.refreshing = refreshing;
+    await this.env.store.currentlyRefreshing.save(refreshing);
+  }
+
+  private async saveLoadedState(lastCheck: LoadedState | null) {
+    this.loadedState = lastCheck;
+    await this.env.store.lastCheck.save(lastCheck);
+  }
+
   private updateBadge() {
     let badgeState: BadgeState;
     const unreviewedPullRequests = this.unreviewedPullRequests;
@@ -141,21 +181,6 @@ export class Core {
       };
     }
     this.env.badger.update(badgeState);
-  }
-
-  private async saveError(error: string | null) {
-    this.lastError = error;
-    await this.env.store.lastError.save(error);
-  }
-
-  private async saveRefreshing(refreshing: boolean) {
-    this.refreshing = refreshing;
-    await this.env.store.currentlyRefreshing.save(refreshing);
-  }
-
-  private async saveLoadedState(lastCheck: LoadedState | null) {
-    this.loadedState = lastCheck;
-    await this.env.store.lastCheck.save(lastCheck);
   }
 
   triggerBackgroundRefresh() {

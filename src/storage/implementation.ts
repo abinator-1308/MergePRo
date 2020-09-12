@@ -16,6 +16,11 @@ export function buildStore(chromeApi: ChromeApi): Store {
       false
     ),
     token: chromeValueStorage<string>(chromeApi, "gitHubApiToken"),
+    notifiedPullRequests: chromeValueStorageWithDefault<string[]>(
+      chromeApi,
+      "lastSeenPullRequests",
+      []
+    ),
     lastRequestForTabsPermission: chromeValueStorage<number>(
       chromeApi,
       "lastRequestForTabsPermission"
