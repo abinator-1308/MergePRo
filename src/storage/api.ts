@@ -7,7 +7,7 @@ export interface Store {
   //Storage of whether a refresh is happening in the background.
 
   currentlyRefreshing: ValueStorage<boolean>;
-  
+
   /**
    * Storage of the last information we loaded about pull requests.
    */
@@ -16,6 +16,7 @@ export interface Store {
   //Storage of the user's provided GitHub token.
   token: ValueStorage<string | null>;
 
+  notifiedPullRequests: ValueStorage<string[]>;
   /**
    * Storage of the last timestamp we requested the "tabs" permission.
    */

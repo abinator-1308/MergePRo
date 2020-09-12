@@ -1,15 +1,17 @@
+import { Badger } from "../badge/api";
 import { GitHubLoader } from "../loading/api";
 import { CrossScriptMessenger } from "../messaging/api";
+import { Notifier } from "../notifications/api";
 import { Store } from "../storage/api";
 import { TabOpener } from "../tabs/api";
-import { Badger } from "../badge/api";
 
 export interface Environment {
   store: Store;
   githubLoader: GitHubLoader;
+  notifier: Notifier;
+  badger: Badger;
   messenger: CrossScriptMessenger;
   tabOpener: TabOpener;
-  badger: Badger;
   getCurrentTime(): number;
   isOnline(): boolean;
 }
