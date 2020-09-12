@@ -6,9 +6,6 @@ import {
   getLastReviewOrCommentTimestamp,
 } from "./timestamps";
 
-/**
- * Returns the {@link PullRequestState} of a PR.
- */
 export function pullRequestState(
   pr: PullRequest,
   currentUserLogin: string
@@ -16,7 +13,11 @@ export function pullRequestState(
   if (pr.author.login === currentUserLogin) {
     return outgoingPullRequestState(pr, currentUserLogin);
   }
-  if (!pr.reviewRequested && !userPreviouslyReviewed(pr, currentUserLogin)) {
+  if (
+    !pr.reviewRequested &&
+    !pr.userMentioned &&
+    !userPreviouslyReviewed(pr, currentUserLogin)
+  ) {
     return {
       kind: "not-involved",
       draft: pr.draft === true,
@@ -42,6 +43,7 @@ function incomingPullRequestState(
     kind: "incoming",
     draft: pr.draft === true,
     newReviewRequested: !hasReviewed,
+    isUserMentioned: !hasReviewed,
     authorResponded: hasReviewed && hasNewCommentByAuthor,
     newCommit: hasReviewed && hasNewCommit,
   };
@@ -92,7 +94,7 @@ function outgoingPullRequestState(
     }
     if (!stateByUser.has(comment.authorLogin)) {
       stateByUser.set(comment.authorLogin, "COMMENTED");
-    }   
+    }
   }
 
   // Requested reviewers are specifically reviewers who haven't posted a review
@@ -121,85 +123,33 @@ export type PullRequestState = IncomingState | NotInvolvedState | OutgoingState;
  */
 export interface IncomingState {
   kind: "incoming";
-
-  /**
-   * True if the PR is a draft.
-   */
   draft: boolean;
-
-  /**
-   * True if a review has been requested from the user, but they haven't
-   * submitted any review or comments on the PR yet.
-   */
+  isUserMentioned: boolean;
   newReviewRequested: boolean;
-
-  /**
-   * True if the author posted a comment after a review or comment was
-   * previously submitted by the user.
-   */
   authorResponded: boolean;
-
-  /**
-   * True if a new commit was added to the PR after a review or comment was
-   * previously submitted by the user.
-   */
   newCommit: boolean;
 }
 
-/**
- * The current user is not involved in the PR. That is, they are not a
- * reviewer and haven't posted any comments.
- */
 export interface NotInvolvedState {
   kind: "not-involved";
-
-  /**
-   * True if the PR is a draft.
-   */
   draft: boolean;
 }
 
-/**
- * The PR that authored by the current user.
- */
 export interface OutgoingState {
   kind: "outgoing";
-
-  /**
-   * True if the PR is a draft.
-   */
   draft: boolean;
-
-  /**
-   * True if the PR has no reviewers yet.
-   */
   noReviewers: boolean;
-
-  /**
-   * True if the PR received review comments which need to be addressed either
-   * by responding or adding new commits.
-   */
   changesRequested: boolean;
-
-  /**
-   * True if GitHub indicates that the PR can be merged.
-   */
   mergeable: boolean;
-
-  /**
-   * True if the PR was approved by all reviewers.
-   */
   approvedByEveryone: boolean;
 }
 
-export function isReviewRequired(
-  state: PullRequestState,
-  ignoreNewCommits: boolean
-) {
+export function isReviewRequired(state: PullRequestState) {
   return (
     state.kind === "incoming" &&
     (state.newReviewRequested ||
+      state.isUserMentioned ||
       state.authorResponded ||
-      (!ignoreNewCommits && state.newCommit))
+      state.newCommit)
   );
 }

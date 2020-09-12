@@ -1,4 +1,4 @@
-import { observable, computed } from "mobx";
+import { computed, observable } from "mobx";
 import { Environment } from "../environment/api";
 import { LoadedState } from "../storage/loaded-state";
 import { BadgeState } from "../badge/api";
@@ -36,6 +36,7 @@ export class Core {
     if (this.token !== null) {
       this.refreshing = await this.env.store.currentlyRefreshing.load();
       this.lastError = await this.env.store.lastError.load();
+      this.loadedState = await this.env.store.lastCheck.load();
     } else {
       this.refreshing = false;
       this.lastError = null;
@@ -50,11 +51,12 @@ export class Core {
     await this.env.store.token.save(token);
     await this.saveRefreshing(false);
     await this.saveError(null);
+    await this.saveLoadedState(null);
     await this.load();
     this.triggerBackgroundRefresh();
   }
 
-  async checkAuth() {
+  async refreshPullRequests() {
     if (!this.token) {
       console.debug("Not authenticated, skipping refresh.");
       return;
@@ -64,6 +66,29 @@ export class Core {
       return;
     }
     await this.saveRefreshing(true);
+    await this.triggerReload();
+    try {
+      const startRefreshTimestamp = this.env.getCurrentTime();
+      await this.saveLoadedState({
+        startRefreshTimestamp,
+        ...(await this.env.githubLoader(this.token, this.loadedState)),
+      });
+      const notifyAboutPullRequests = [
+        ...(this.unreviewedPullRequests || []),
+        ...(this.actionRequiredOwnPullRequests || []),
+      ];
+      this.saveError(null);
+    } catch (e) {
+      this.saveError(e.message);
+      throw e;
+    } finally {
+      await this.saveRefreshing(false);
+      this.triggerReload();
+    }
+  }
+
+  async openPullRequest(pullRequestUrl: string) {
+    await this.env.tabOpener.openPullRequest(pullRequestUrl);
   }
 
   @computed
@@ -76,7 +101,6 @@ export class Core {
       this.env,
       lastCheck.userLogin,
       lastCheck.openPullRequests,
-      this.muteConfiguration
     );
   }
 
@@ -133,9 +157,24 @@ export class Core {
     await this.env.store.currentlyRefreshing.save(refreshing);
   }
 
+  private async saveLoadedState(lastCheck: LoadedState | null) {
+    this.loadedState = lastCheck;
+    await this.env.store.lastCheck.save(lastCheck);
+  }
+
   triggerBackgroundRefresh() {
     this.env.messenger.send({
       kind: "refresh",
+    });
+
+    if (process.env.NODE_ENV === "development") {
+      this.refreshPullRequests().catch(console.error);
+    }
+  }
+
+  private triggerReload() {
+    this.env.messenger.send({
+      kind: "reload",
     });
   }
 }

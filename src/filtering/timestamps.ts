@@ -32,8 +32,7 @@ export function getLastReviewOrCommentTimestamp(
   let lastCommentedTime = 0;
   for (const review of pr.reviews) {
     if (review.state === "PENDING") {
-      // Ignore pending reviews (we don't want a user to think that they've submitted their
-      // review when they didn't yet).
+      // Ignore pending reviews
       continue;
     }
     const submittedAt = new Date(review.submittedAt).getTime();

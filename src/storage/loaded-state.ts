@@ -1,3 +1,5 @@
+import { PullRequestReference } from "../github-api/api";
+
 export interface LoadedState {
   /**
    * The timestamp at which we started loading the state.
@@ -9,6 +11,9 @@ export interface LoadedState {
 
   userLogin: string;
   avatarUrl: string;
+
+  //The list of all open pull requests across all repositories.
+  openPullRequests: PullRequest[];
 }
 
 export interface Repo {
@@ -17,22 +22,14 @@ export interface Repo {
   pushedAt: string;
 }
 
-
-export interface Comment {
-  authorLogin: string;
-  createdAt: string;
-}
-
-
-export interface Review {
-  authorLogin: string;
-  state: ReviewState;
-  submittedAt: string;
-}
-
-export interface Commit {
-  authorLogin: string;
-  createdAt: string;
+export function ref(pullRequest: PullRequest): PullRequestReference {
+  return {
+    repo: {
+      owner: pullRequest.repoOwner,
+      name: pullRequest.repoName,
+    },
+    number: pullRequest.pullRequestNumber,
+  };
 }
 
 export interface PullRequest {
@@ -49,18 +46,28 @@ export interface PullRequest {
   title: string;
   draft?: boolean;
   mergeable?: boolean;
-  /**
-   * Whether a review is requested from the current user.
-   */
   reviewRequested: boolean;
-  /**
-   * List of reviewers who are yet to review the PR (or who were requested to review again).
-   */
-  // TODO: Make this required in September 2019.
+  userMentioned: boolean;
   requestedReviewers?: string[];
   reviews: Review[];
   comments: Comment[];
   commits?: Commit[];
+}
+
+export interface Comment {
+  authorLogin: string;
+  createdAt: string;
+}
+
+export interface Review {
+  authorLogin: string;
+  state: ReviewState;
+  submittedAt: string;
+}
+
+export interface Commit {
+  authorLogin: string;
+  createdAt: string;
 }
 
 export type ReviewState =
