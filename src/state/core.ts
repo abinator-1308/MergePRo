@@ -1,14 +1,13 @@
 import { computed, observable } from "mobx";
-import { Environment } from "../environment/api";
-import { LoadedState } from "../storage/loaded-state";
 import { BadgeState } from "../badge/api";
+import { Environment } from "../environment/api";
 import { EnrichedPullRequest } from "../filtering/enriched-pull-request";
 import {
   Filter,
   FilteredPullRequests,
   filterPullRequests,
 } from "../filtering/filters";
-import { NOTHING_MUTED } from "../storage/mute-configuration";
+import { LoadedState } from "../storage/loaded-state";
 
 export class Core {
   private readonly env: Environment;
@@ -18,8 +17,6 @@ export class Core {
   @observable token: string | null = null;
   @observable loadedState: LoadedState | null = null;
   @observable lastError: string | null = null;
-  @observable muteConfiguration = NOTHING_MUTED;
-
 
   constructor(env: Environment) {
     this.env = env;
@@ -44,6 +41,7 @@ export class Core {
       this.loadedState = null;
     }
     this.overallStatus = "loaded";
+    this.updateBadge();
   }
 
   async setNewToken(token: string) {
@@ -67,22 +65,20 @@ export class Core {
     }
     await this.saveRefreshing(true);
     await this.triggerReload();
+    this.updateBadge();
     try {
       const startRefreshTimestamp = this.env.getCurrentTime();
       await this.saveLoadedState({
         startRefreshTimestamp,
         ...(await this.env.githubLoader(this.token, this.loadedState)),
       });
-      const notifyAboutPullRequests = [
-        ...(this.unreviewedPullRequests || []),
-        ...(this.actionRequiredOwnPullRequests || []),
-      ];
       this.saveError(null);
     } catch (e) {
       this.saveError(e.message);
       throw e;
     } finally {
       await this.saveRefreshing(false);
+      this.updateBadge();
       this.triggerReload();
     }
   }
@@ -100,7 +96,7 @@ export class Core {
     return filterPullRequests(
       this.env,
       lastCheck.userLogin,
-      lastCheck.openPullRequests,
+      lastCheck.openPullRequests
     );
   }
 

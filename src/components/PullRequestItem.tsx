@@ -2,6 +2,7 @@ import { observer } from "mobx-react-lite";
 import React from "react";
 import { isRunningAsPopup } from "../popup-environment";
 import { PullRequestItemProps } from "../interface";
+import { PullRequestStatus } from "./PullRequestStatus";
 import {
   AuthorAvatar,
   AuthorBox,
@@ -26,6 +27,7 @@ export const PullRequestItem = observer((props: PullRequestItemProps) => {
     >
       <Info>
         <Title>{props.pullRequest.title}</Title>
+        <PullRequestStatus pullRequest={props.pullRequest} />
         <Repo>
           {props.pullRequest.repoOwner}/{props.pullRequest.repoName} (#
           {props.pullRequest.pullRequestNumber})
