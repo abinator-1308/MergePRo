@@ -44,6 +44,18 @@ export class Core {
     this.triggerBackgroundRefresh();
   }
 
+  async checkAuth() {
+    if (!this.token) {
+      console.debug("Not authenticated, skipping refresh.");
+      return;
+    }
+    if (!this.env.isOnline()) {
+      console.debug("Not online, skipping refresh.");
+      return;
+    }
+    await this.saveRefreshing(true);
+  }
+
   private async saveError(error: string | null) {
     this.lastError = error;
     await this.env.store.lastError.save(error);
