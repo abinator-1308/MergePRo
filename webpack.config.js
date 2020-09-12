@@ -3,6 +3,8 @@ const webpack = require("webpack");
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
   .BundleAnalyzerPlugin;
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const CopyPlugin = require("copy-webpack-plugin");
+
 
 module.exports = {
   module: {
@@ -54,6 +56,12 @@ module.exports = {
       inject: true,
       chunks: ["popup"],
     }),
+    
+  new CopyPlugin([
+    { from: "manifest.json", to: "." },
+    { from: "images", to: "images" },
+  ]),
+
     new webpack.IgnorePlugin(/^\.\/locale$/),
     ...(process.env.BUNDLE_ANALYZER ? [new BundleAnalyzerPlugin()] : []),
   ],
