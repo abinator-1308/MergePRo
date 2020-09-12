@@ -1,6 +1,8 @@
 {
   "private": true,
   "dependencies": {
+    "@octokit/plugin-throttling": "^3.2.0",
+    "@octokit/rest": "^16.43.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1"
   },
