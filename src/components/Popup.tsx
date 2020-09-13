@@ -5,6 +5,7 @@ import { Filter } from "../filtering/filters";
 import { PullRequest, ref } from "../storage/loaded-state";
 import { MuteType } from "../storage/mute-configuration";
 import { Row } from "./design/Row";
+import { IgnoredRepositories } from "./IgnoredRepositories";
 import { Loader } from "./Loader";
 import { PullRequestList } from "./PullRequestList";
 import { Settings } from "./Settings";
@@ -164,6 +165,7 @@ export const Popup = observer((props: CoreProps) => {
             />
           </>
         )}
+      <IgnoredRepositories core={props.core} />
       <Settings core={props.core} />
     </>
   );
