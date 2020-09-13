@@ -2,6 +2,8 @@ import { observer } from "mobx-react-lite";
 import React, { useState, useEffect } from "react";
 import { Badge, Tab, Tabs } from "react-bootstrap";
 import { Filter } from "../filtering/filters";
+import { PullRequest, ref } from "../storage/loaded-state";
+import { MuteType } from "../storage/mute-configuration";
 import { Row } from "./design/Row";
 import { Loader } from "./Loader";
 import { PullRequestList } from "./PullRequestList";
@@ -33,6 +35,18 @@ export const Popup = observer((props: CoreProps) => {
 
   const onOpen = (pullRequestUrl: string) => {
     props.core.openPullRequest(pullRequestUrl).catch(console.error);
+  };
+
+  const onMute = (pullRequest: PullRequest, muteType: MuteType) => {
+    props.core.mutePullRequest(ref(pullRequest), muteType);
+  };
+
+  const onUnmute = (pullRequest: PullRequest) => {
+    props.core.unmutePullRequest(ref(pullRequest));
+  };
+
+  const onToggleNewCommitsNotification = () => {
+    props.core.toggleNewCommitsNotificationSetting();
   };
 
   if (props.core.overallStatus !== "loaded") {
@@ -82,6 +96,19 @@ export const Popup = observer((props: CoreProps) => {
               <Tab
                 title={
                   <>
+                    Muted{" "}
+                    {props.core.filteredPullRequests && (
+                      <Badge variant="secondary">
+                        {props.core.filteredPullRequests.muted.length}
+                      </Badge>
+                    )}
+                  </>
+                }
+                eventKey={Filter.MUTED}
+              />
+              <Tab
+                title={
+                  <>
                     Reviewed{" "}
                     {props.core.filteredPullRequests && (
                       <Badge variant="secondary">
@@ -117,8 +144,23 @@ export const Popup = observer((props: CoreProps) => {
                   ? `No PRs to review, yay!`
                   : `No PRs here!`
               }
+              mutingConfiguration={
+                state.currentFilter === Filter.INCOMING
+                  ? "allow-muting"
+                  : state.currentFilter === Filter.MUTED
+                  ? "allow-unmuting"
+                  : "none"
+              }
+              newCommitsNotificationToggled={
+                state.currentFilter === Filter.INCOMING
+                  ? !props.core.muteConfiguration.ignoreNewCommits
+                  : null
+              }
+              onToggleNewCommitsNotification={onToggleNewCommitsNotification}
               onOpenAll={onOpenAll}
               onOpen={onOpen}
+              onMute={onMute}
+              onUnmute={onUnmute}
             />
           </>
         )}

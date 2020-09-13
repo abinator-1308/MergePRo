@@ -9,6 +9,20 @@ const List = styled.div`
     sans-serif, Apple Color Emoji, Segoe UI Emoji;
 `;
 
+const NewCommitsToggle = styled.label`
+  display: inline-block;
+  padding: 8px;
+  margin-right: -55px;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial,
+    sans-serif, Apple Color Emoji, Segoe UI Emoji;
+`;
+
+const NewCommitsCheckbox = styled.input`
+  margin-right: 8px;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial,
+    sans-serif, Apple Color Emoji, Segoe UI Emoji;
+`;
+
 const OpenAllParagraph = styled(Paragraph)`
   display: inline-block;
   text-align: center;
@@ -19,4 +33,4 @@ const OpenAllParagraph = styled(Paragraph)`
     sans-serif, Apple Color Emoji, Segoe UI Emoji;
 `;
 
-export { OpenAllParagraph, List };
+export { OpenAllParagraph, NewCommitsCheckbox, NewCommitsToggle, List };
