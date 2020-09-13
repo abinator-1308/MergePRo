@@ -12,7 +12,7 @@ MergePRo - A collaboration tool for developers to manage their codebase and Pull
 4. Enjoy
 
 ## DEMO LINK
-<a href="https://www.youtube.com/watch?v=isp5u4CD2j4&feature=youtu.be"> MERGE PRO</a>
+<a href="https://www.youtube.com/watch?v=fSRa-JaeOvE&feature=youtu.be&ab_channel=AbhinavSingh"> MERGE PRO</a>
 [PLEASE ON THE SUBTITLES]
 
 ## How to build it yourself
