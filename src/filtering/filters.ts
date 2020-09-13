@@ -11,6 +11,7 @@ export enum Filter {
   REVIEWED = "reviewed",
   MUTED = "muted",
   MINE = "mine",
+  IGNORED = "ignored",
 }
 
 export type FilteredPullRequests = {
@@ -48,5 +49,8 @@ export function filterPullRequests(
         !pr.state.authorResponded
     ),
     mine: enrichedPullRequests.filter((pr) => pr.author.login === userLogin),
+    ignored: enrichedPullRequests.filter(
+      (pr) => isMuted(env, pr, muteConfiguration) === MutedResult.INVISIBLE
+    ),
   };
 }
