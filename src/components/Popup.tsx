@@ -123,7 +123,7 @@ export const Popup = observer((props: CoreProps) => {
               <Tab
                 title={
                   <>
-                    Requested{" "}
+                    My PRs{" "}
                     {props.core.filteredPullRequests && (
                       <Badge variant="secondary">
                         {props.core.filteredPullRequests.mine.length}

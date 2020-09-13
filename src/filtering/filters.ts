@@ -31,26 +31,36 @@ export function filterPullRequests(
 
   const ignoreNewCommits = !!muteConfiguration.ignoreNewCommits;
   return {
-    incoming: enrichedPullRequests.filter(
-      (pr) =>
-        isReviewRequired(pr.state, ignoreNewCommits) &&
-        isMuted(env, pr, muteConfiguration) === MutedResult.VISIBLE
-    ),
-    muted: enrichedPullRequests.filter(
-      (pr) =>
-        isReviewRequired(pr.state, ignoreNewCommits) &&
-        isMuted(env, pr, muteConfiguration) === MutedResult.MUTED
-    ),
-    reviewed: enrichedPullRequests.filter(
-      (pr) =>
-        pr.state.kind === "incoming" &&
-        !pr.state.newReviewRequested &&
-        (!pr.state.newCommit || ignoreNewCommits) &&
-        !pr.state.authorResponded
-    ),
-    mine: enrichedPullRequests.filter((pr) => pr.author.login === userLogin),
-    ignored: enrichedPullRequests.filter(
-      (pr) => isMuted(env, pr, muteConfiguration) === MutedResult.INVISIBLE
-    ),
+    incoming: enrichedPullRequests
+      .filter(
+        (pr) =>
+          isReviewRequired(pr.state, ignoreNewCommits) &&
+          isMuted(env, pr, muteConfiguration) === MutedResult.VISIBLE
+      )
+      .filter((v, i, a) => a.findIndex((t) => t.nodeId === v.nodeId) === i),
+    muted: enrichedPullRequests
+      .filter(
+        (pr) =>
+          isReviewRequired(pr.state, ignoreNewCommits) &&
+          isMuted(env, pr, muteConfiguration) === MutedResult.MUTED
+      )
+      .filter((v, i, a) => a.findIndex((t) => t.nodeId === v.nodeId) === i),
+    reviewed: enrichedPullRequests
+      .filter(
+        (pr) =>
+          pr.state.kind === "incoming" &&
+          !pr.state.newReviewRequested &&
+          (!pr.state.newCommit || ignoreNewCommits) &&
+          !pr.state.authorResponded
+      )
+      .filter((v, i, a) => a.findIndex((t) => t.nodeId === v.nodeId) === i),
+    mine: enrichedPullRequests
+      .filter((pr) => pr.author.login === userLogin)
+      .filter((v, i, a) => a.findIndex((t) => t.nodeId === v.nodeId) === i),
+    ignored: enrichedPullRequests
+      .filter(
+        (pr) => isMuted(env, pr, muteConfiguration) === MutedResult.INVISIBLE
+      )
+      .filter((v, i, a) => a.findIndex((t) => t.nodeId === v.nodeId) === i),
   };
 }

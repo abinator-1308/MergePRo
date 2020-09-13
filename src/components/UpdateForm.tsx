@@ -13,7 +13,7 @@ export const UpdateForm = (props: UpdateFormProps) => (
         color="primary"
         onClick={props.openFunc}
         size="small"
-        style={{ margin: "5px" }}
+        style={{ margin: "8px", marginRight: "12px" }}
       >
         {props.title}
       </Button>

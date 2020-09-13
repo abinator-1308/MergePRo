@@ -56,7 +56,7 @@ const AuthorBox = styled.div`
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial,
     sans-serif, Apple Color Emoji, Segoe UI Emoji;
   width: ${AuthorWidth};
-  padding: 8px;
+  padding: 10px;
 `;
 
 const AuthorAvatar = styled.img`
@@ -73,7 +73,7 @@ const AuthorLogin = styled.div`
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
-  margin-right: 20px;
+  margin-right: 30px;
   font-size: 0.9em;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial,
     sans-serif, Apple Color Emoji, Segoe UI Emoji;

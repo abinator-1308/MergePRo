@@ -1,15 +1,15 @@
 import { observer } from "mobx-react-lite";
 import React from "react";
-import { Button } from "@material-ui/core";
 import { Paragraph } from "./design/Paragraph";
 import { Loader } from "./Loader";
 import { PullRequestItem } from "./PullRequestItem";
 import { PullRequestListProps } from "../interface";
 import {
-  OpenAllParagraph,
   NewCommitsCheckbox,
   NewCommitsToggle,
   List,
+  StyledButton,
+  StyledButtonToggle,
 } from "./design/styled-pr-list";
 
 export const PullRequestList = observer((props: PullRequestListProps) => (
@@ -24,9 +24,10 @@ export const PullRequestList = observer((props: PullRequestListProps) => (
         Turn Notifications on for New Commits
       </NewCommitsToggle>
     )}
-    {props.pullRequests && props.pullRequests.length > 1 && (
-      <OpenAllParagraph>
-        <Button
+    {props.pullRequests &&
+      props.pullRequests.length > 1 &&
+      (props.newCommitsNotificationToggled !== null ? (
+        <StyledButtonToggle
           variant="outlined"
           color="primary"
           onClick={props.onOpenAll}
@@ -34,9 +35,18 @@ export const PullRequestList = observer((props: PullRequestListProps) => (
           size="small"
         >
           VIEW ALL
-        </Button>
-      </OpenAllParagraph>
-    )}
+        </StyledButtonToggle>
+      ) : (
+        <StyledButton
+          variant="outlined"
+          color="primary"
+          onClick={props.onOpenAll}
+          href="https://github.com/notifications?query=is%3Aissue-or-pull-request++"
+          size="small"
+        >
+          VIEW ALL
+        </StyledButton>
+      ))}
     {props.pullRequests === null ? (
       <Loader />
     ) : props.pullRequests.length === 0 ? (

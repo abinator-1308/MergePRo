@@ -114,7 +114,7 @@ export const Settings = observer((props: CoreProps) => {
                   <Refresh />
                 </Tooltip>
               </Link>
-              {!isRunningAsPopup && (
+              {isRunningAsPopup() && (
                 <FullScreenLink
                   target="_blank"
                   href={`chrome-extension://${chromeRunTimeId}/index.html`}
