@@ -5,5 +5,5 @@ export const Link = styled.a`
   font-weight: bold;
   color: #000;
   cursor: pointer;
-  margin-right: 7px;
+  margin: 0 6px;
 `;
