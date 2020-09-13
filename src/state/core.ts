@@ -7,7 +7,17 @@ import {
   FilteredPullRequests,
   filterPullRequests,
 } from "../filtering/filters";
+import { PullRequestReference, RepoReference } from "../github-api/api";
 import { LoadedState, PullRequest } from "../storage/loaded-state";
+import {
+  addMute,
+  MuteConfiguration,
+  MuteType,
+  NOTHING_MUTED,
+  removeOwnerMute,
+  removePullRequestMute,
+  removeRepositoryMute,
+} from "../storage/mute-configuration";
 
 export class Core {
   private readonly env: Environment;
@@ -16,6 +26,7 @@ export class Core {
   @observable refreshing: boolean = false;
   @observable token: string | null = null;
   @observable loadedState: LoadedState | null = null;
+  @observable muteConfiguration = NOTHING_MUTED;
   @observable notifiedPullRequestUrls = new Set<string>();
   @observable lastError: string | null = null;
 
@@ -40,6 +51,7 @@ export class Core {
       this.notifiedPullRequestUrls = new Set(
         await this.env.store.notifiedPullRequests.load()
       );
+      this.muteConfiguration = await this.env.store.muteConfiguration.load();
       this.loadedState = await this.env.store.lastCheck.load();
     } else {
       this.refreshing = false;
@@ -47,6 +59,7 @@ export class Core {
       this.token = null;
       this.loadedState = null;
       this.notifiedPullRequestUrls = new Set();
+      this.muteConfiguration = NOTHING_MUTED;
     }
     this.overallStatus = "loaded";
     this.updateBadge();
@@ -59,6 +72,7 @@ export class Core {
     await this.saveError(null);
     await this.saveNotifiedPullRequests([]);
     await this.saveLoadedState(null);
+    await this.saveMuteConfiguration(NOTHING_MUTED);
     await this.load();
     this.triggerBackgroundRefresh();
   }
@@ -105,6 +119,42 @@ export class Core {
     await this.env.tabOpener.openPullRequest(pullRequestUrl);
   }
 
+  async mutePullRequest(pullRequest: PullRequestReference, muteType: MuteType) {
+    await this.saveMuteConfiguration(
+      addMute(this.env, this.muteConfiguration, pullRequest, muteType)
+    );
+    this.updateBadge();
+  }
+
+  async unmutePullRequest(pullRequest: PullRequestReference) {
+    await this.saveMuteConfiguration(
+      removePullRequestMute(this.muteConfiguration, pullRequest)
+    );
+    this.updateBadge();
+  }
+
+  async unmuteOwner(owner: string) {
+    await this.saveMuteConfiguration(
+      removeOwnerMute(this.muteConfiguration, owner)
+    );
+    this.updateBadge();
+  }
+
+  async unmuteRepository(repo: RepoReference) {
+    await this.saveMuteConfiguration(
+      removeRepositoryMute(this.muteConfiguration, repo)
+    );
+    this.updateBadge();
+  }
+
+  async toggleNewCommitsNotificationSetting() {
+    await this.saveMuteConfiguration({
+      ...this.muteConfiguration,
+      ignoreNewCommits: !this.muteConfiguration.ignoreNewCommits,
+    });
+    this.updateBadge();
+  }
+
   @computed
   get filteredPullRequests(): FilteredPullRequests | null {
     const lastCheck = this.loadedState;
@@ -114,7 +164,8 @@ export class Core {
     return filterPullRequests(
       this.env,
       lastCheck.userLogin,
-      lastCheck.openPullRequests
+      lastCheck.openPullRequests,
+      this.muteConfiguration
     );
   }
 
@@ -156,6 +207,11 @@ export class Core {
   private async saveLoadedState(lastCheck: LoadedState | null) {
     this.loadedState = lastCheck;
     await this.env.store.lastCheck.save(lastCheck);
+  }
+
+  private async saveMuteConfiguration(muteConfiguration: MuteConfiguration) {
+    this.muteConfiguration = muteConfiguration;
+    await this.env.store.muteConfiguration.save(muteConfiguration);
   }
 
   private updateBadge() {
