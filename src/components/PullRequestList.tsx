@@ -5,10 +5,25 @@ import { Paragraph } from "./design/Paragraph";
 import { Loader } from "./Loader";
 import { PullRequestItem } from "./PullRequestItem";
 import { PullRequestListProps } from "../interface";
-import { OpenAllParagraph, List } from "./design/styled-pr-list";
+import {
+  OpenAllParagraph,
+  NewCommitsCheckbox,
+  NewCommitsToggle,
+  List,
+} from "./design/styled-pr-list";
 
 export const PullRequestList = observer((props: PullRequestListProps) => (
   <List>
+    {props.newCommitsNotificationToggled !== null && (
+      <NewCommitsToggle>
+        <NewCommitsCheckbox
+          type="checkbox"
+          checked={props.newCommitsNotificationToggled}
+          onChange={props.onToggleNewCommitsNotification}
+        />
+        Turn Notifications on for New Commits
+      </NewCommitsToggle>
+    )}
     {props.pullRequests && props.pullRequests.length > 1 && (
       <OpenAllParagraph>
         <Button
@@ -32,7 +47,10 @@ export const PullRequestList = observer((props: PullRequestListProps) => (
           <PullRequestItem
             key={pullRequest.nodeId}
             pullRequest={pullRequest}
+            mutingConfiguration={props.mutingConfiguration}
             onOpen={props.onOpen}
+            onMute={props.onMute}
+            onUnmute={props.onUnmute}
           />
         ))}
       </>
