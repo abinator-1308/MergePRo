@@ -33,15 +33,14 @@ ReactDOM.render(
   <>
     <Global
       styles={css`
-        @import url("https://fonts.googleapis.com/css?family=Roboto");
-
         body {
           color: #24292e;
           background-color: #fafbfc !important;
           margin: 0 auto;
           padding: 8px;
           width: 520px;
-          font-family: Roboto, sans-serif;
+          font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica,
+            Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
           font-size: 14px;
         }
 

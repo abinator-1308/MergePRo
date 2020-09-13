@@ -10,8 +10,6 @@ const AuthorAvatar = styled.img`
   border-radius: 50%;
   position: relative;
   left: 67%;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial,
-    sans-serif, Apple Color Emoji, Segoe UI Emoji;
 `;
 const StyledTypography = styled(Typography)`
   color: white;
@@ -20,8 +18,6 @@ const StyledTypography = styled(Typography)`
   right: 30px;
   margin-right: 20px;
   top: 14px;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial,
-    sans-serif, Apple Color Emoji, Segoe UI Emoji;
 `;
 
 const StyledTooltip = styled(Tooltip)`

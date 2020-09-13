@@ -15,8 +15,6 @@ const TokenInput = styled.input`
   flex-grow: 1;
   padding: 4px 8px;
   margin-right: 8px;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial,
-    sans-serif, Apple Color Emoji, Segoe UI Emoji;
 
   &:focus {
     outline-color: #2ee59d;
@@ -26,8 +24,6 @@ const TokenInput = styled.input`
 const FullScreenLink = styled(Link)`
   opacity: 0.7;
   border-radius: 25px;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial,
-    sans-serif, Apple Color Emoji, Segoe UI Emoji;
   &:hover {
     opacity: 1;
   }
