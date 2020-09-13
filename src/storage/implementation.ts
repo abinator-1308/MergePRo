@@ -5,6 +5,7 @@ import {
   chromeValueStorageWithDefault,
 } from "./utils/chrome-value-storage";
 import { LoadedState } from "./loaded-state";
+import { NOTHING_MUTED } from "./mute-configuration";
 
 export function buildStore(chromeApi: ChromeApi): Store {
   return {
@@ -14,6 +15,11 @@ export function buildStore(chromeApi: ChromeApi): Store {
       chromeApi,
       "currentlyRefreshing",
       false
+    ),
+    muteConfiguration: chromeValueStorageWithDefault(
+      chromeApi,
+      "mute",
+      NOTHING_MUTED
     ),
     token: chromeValueStorage<string>(chromeApi, "gitHubApiToken"),
     notifiedPullRequests: chromeValueStorageWithDefault<string[]>(

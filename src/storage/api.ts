@@ -1,4 +1,5 @@
 import { LoadedState } from "./loaded-state";
+import { MuteConfiguration } from "./mute-configuration";
 
 export interface Store {
   //Storage of the last error seen when fetching GitHub data
@@ -7,6 +8,11 @@ export interface Store {
   //Storage of whether a refresh is happening in the background.
 
   currentlyRefreshing: ValueStorage<boolean>;
+
+  /**
+   * Storage of the currently muted pull requests.
+   */
+  muteConfiguration: ValueStorage<MuteConfiguration>;
 
   /**
    * Storage of the last information we loaded about pull requests.
