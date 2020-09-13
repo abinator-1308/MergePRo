@@ -3,7 +3,7 @@ MergePRo - A collaboration tool for developers to manage their codebase and Pull
 
 ## How to install
 
-1. Install the [Chrome extension] (URL COMING SOON...)
+1. Install the [Chrome extension] ( <img src="./updates/installation.gif" />)
 2. [Create a GitHub personal access token with the **repo** permission](https://github.com/settings/tokens)
 3. Enter the token into the extension
 4. Enjoy
