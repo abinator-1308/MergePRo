@@ -44,6 +44,19 @@ const partialFakeChrome: RecursivePartial<ChromeApi> = {
       callback({});
     },
   },
+  notifications: {
+    create(
+      notificationId: string,
+      options: chrome.notifications.NotificationOptions
+    ) {
+      console.log("chrome.notifications.create", notificationId, options);
+    },
+    onClicked: {
+      addListener(callback: (notificationId: string) => void) {
+        console.log("chrome.notifications.onClicked.addListener", callback);
+      },
+    },
+  },
   storage: {
     // To simulate chrome.storage.local, we simply fall back to the localStorage API.
     local: {

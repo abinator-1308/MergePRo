@@ -9,10 +9,10 @@ export const UpdateForm = (props: UpdateFormProps) => (
     <Paragraph>{props.desc}</Paragraph>
     <Center>
       <Button
-        variant="contained"
+        variant="outlined"
         color="primary"
         onClick={props.openFunc}
-        size="medium"
+        size="small"
         style={{ margin: "5px" }}
       >
         {props.title}

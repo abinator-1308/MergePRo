@@ -27,7 +27,7 @@ const OpenAllParagraph = styled(Paragraph)`
   display: inline-block;
   text-align: center;
   position: relative;
-  left: 45%;
+  left: 35%;
   color: #777;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial,
     sans-serif, Apple Color Emoji, Segoe UI Emoji;

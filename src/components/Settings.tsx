@@ -1,5 +1,6 @@
 import styled from "@emotion/styled";
 import { observer } from "mobx-react-lite";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { FormEvent, useRef, useState } from "react";
 import { CoreProps } from "../interface";
 import { Button, Tooltip, Zoom } from "@material-ui/core";
@@ -7,6 +8,7 @@ import { Link } from "./design/Link";
 import { Paragraph } from "./design/Paragraph";
 import { Row } from "./design/Row";
 import { UpdateForm } from "./UpdateForm";
+import { isRunningAsPopup } from "../popup-environment";
 import { Visibility, AddToQueue, Refresh } from "@material-ui/icons";
 
 const TokenInput = styled.input`
@@ -20,6 +22,18 @@ const TokenInput = styled.input`
     outline-color: #2ee59d;
   }
 `;
+
+const FullScreenLink = styled(Link)`
+  opacity: 0.7;
+  border-radius: 25px;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial,
+    sans-serif, Apple Color Emoji, Segoe UI Emoji;
+  &:hover {
+    opacity: 1;
+  }
+`;
+
+const chromeRunTimeId = "glecejlpeilpjhbimjhdhajapnbaljla";
 
 export const Settings = observer((props: CoreProps) => {
   const [state, setState] = useState<{
@@ -69,7 +83,12 @@ export const Settings = observer((props: CoreProps) => {
         props.core.loadedState ? (
           <Row>
             <Paragraph>
-              <Link href="https://github.com/notifications/subscriptions">
+              <Link
+                onClick={() =>
+                  window.open("https://github.com/notifications/subscriptions")
+                }
+                color="inherit"
+              >
                 <Tooltip
                   title="Github Subscriptions"
                   TransitionComponent={Zoom}
@@ -78,7 +97,11 @@ export const Settings = observer((props: CoreProps) => {
                   <AddToQueue />
                 </Tooltip>
               </Link>
-              <Link href="https://github.com/watching">
+
+              <Link
+                onClick={() => window.open("https://github.com/watching")}
+                color="inherit"
+              >
                 <Tooltip
                   title="Github Watchlist"
                   TransitionComponent={Zoom}
@@ -95,6 +118,14 @@ export const Settings = observer((props: CoreProps) => {
                   <Refresh />
                 </Tooltip>
               </Link>
+              {!isRunningAsPopup && (
+                <FullScreenLink
+                  target="_blank"
+                  href={`chrome-extension://${chromeRunTimeId}/index.html`}
+                >
+                  <FontAwesomeIcon icon="clone" />
+                </FullScreenLink>
+              )}
             </Paragraph>
             <UpdateForm title="Update token" desc="" openFunc={openForm} />
           </Row>
