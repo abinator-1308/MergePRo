@@ -1,6 +1,8 @@
 # MergePRo
 MergePRo - A collaboration tool for developers to manage their codebase and Pull Requests efficiently.
-<a href="https://fossunited.org"><img src=" http://fossunited.org/files/fossunited-badge.svg" alt="Supported by FOSS United" /></a>
+    <a href="https://fossunited.org/" target="_blank" rel="noopener noreferrer">
+      <img src="http://fossunited.org/files/fossunited-badge.svg" alt="Supported by FOSSUnited">
+    </a>
 
 ## How to install
 
